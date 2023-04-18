@@ -1,11 +1,14 @@
-﻿namespace API.Repositories.Contracts
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+
+namespace API.Repositories.Contracts
 {
     public interface IGeneralRepository<TEntity, TKey>
     {
-        IEnumerable<TEntity> GetAll();
-        TEntity? GetById(TKey key);
-        int Insert(TEntity entity);
-        int Update(TEntity entity);
-        int Delete(TKey key);
+        Task<IEnumerable<TEntity>> GetAllAsync();
+        Task<TEntity?> GetByIdAsync(TKey key);
+        Task<TEntity?> InsertAsync(TEntity entity);
+        Task<TEntity> UpdateAsync(TEntity Entity);
+        Task<TEntity> DeleteAsync(TKey key);
     }
+
 }

@@ -1,50 +1,52 @@
 ﻿using API.Contexts;
 using API.Repositories.Contracts;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Repositories
 {
     public class GeneralRepository<TEntity, TKey, TContext> : IGeneralRepository<TEntity, TKey>
-    where TEntity : class
-    where TContext : MyContext
+        where TEntity : class
+        where TContext : MyContext
     {
         protected TContext _context;
         public GeneralRepository(TContext context)
         {
             _context = context;
         }
-
-        public IEnumerable<TEntity> GetAll()
+        public async Task<TEntity> DeleteAsync(TKey key)
         {
-            return _context.Set<TEntity>().ToList();
+            var entity = await GetByIdAsync(key);
+            _context.Set<TEntity>().Remove(entity!);
+            await _context.SaveChangesAsync();
+            return entity;
+
         }
 
-        public TEntity? GetById(TKey key)
+        public async Task<IEnumerable<TEntity>> GetAllAsync()
         {
-            return _context.Set<TEntity>().Find(key);
+            return await _context.Set<TEntity>().ToListAsync();
         }
 
-        public int Insert(TEntity entity)
+        public async Task<TEntity>? GetByIdAsync(TKey key)
+        {
+            return await _context.Set<TEntity>().FindAsync(key);
+        }
+
+
+        public virtual async Task<TEntity?> InsertAsync(TEntity entity)
         {
             _context.Set<TEntity>().Add(entity);
-            return _context.SaveChanges();
+            await _context.SaveChangesAsync();
+            return entity;
         }
 
-        public int Update(TEntity entity)
-        {
-            _context.Set<TEntity>().Update(entity);
-            return _context.SaveChanges();
-        }
+       
 
-        public int Delete(TKey key)
+        public async Task<TEntity> UpdateAsync(TEntity Entity)
         {
-            var entity = GetById(key);
-            if (entity == null)
-            {
-                return 0;
-            }
-
-            _context.Set<TEntity>().Remove(entity);
-            return _context.SaveChanges();
+            _context.Set<TEntity>().Update(Entity);
+            await _context.SaveChangesAsync();
+            return Entity;
         }
     }
 }
